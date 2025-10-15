@@ -1,7 +1,7 @@
 import React from 'react'
 import emailjs from '@emailjs/browser'
 import { db } from './firebase'
-import { push, ref, serverTimestamp } from 'firebase/database'
+import { push, ref, serverTimestamp, onValue } from 'firebase/database'
 
 const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID
 const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID
@@ -14,6 +14,14 @@ const INITIAL_FORM_VALUES = {
   subject: '',
   message: '',
   newsletter: false
+}
+
+interface GalleryProject {
+  id: string
+  imageUrl: string
+  description: string
+  location: string
+  createdAt: number
 }
 
 function AccordionItem({ id, question, answer }: { id: string, question: string, answer: string }) {
@@ -34,6 +42,25 @@ export default function App() {
   const [formData, setFormData] = React.useState({ ...INITIAL_FORM_VALUES })
   const [status, setStatus] = React.useState<{ type: 'idle' | 'success' | 'error'; message: string }>({ type: 'idle', message: '' })
   const [isSubmitting, setIsSubmitting] = React.useState(false)
+  const [galleryProjects, setGalleryProjects] = React.useState<GalleryProject[]>([])
+
+  // Load gallery projects from Firebase
+  React.useEffect(() => {
+    const projectsRef = ref(db, 'galleryProjects')
+    const unsubscribe = onValue(projectsRef, (snapshot) => {
+      const data = snapshot.val()
+      if (data) {
+        const projectsList: GalleryProject[] = Object.entries(data).map(([id, project]: [string, any]) => ({
+          id,
+          ...project
+        }))
+        setGalleryProjects(projectsList.sort((a, b) => b.createdAt - a.createdAt))
+      } else {
+        setGalleryProjects([])
+      }
+    })
+    return () => unsubscribe()
+  }, [])
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const target = event.target
@@ -435,22 +462,22 @@ export default function App() {
             </div>
           </div>
           <div className="row g-0">
-            {/* Use same external images as placeholders; local images should be placed into /public/images */}
-            {[
-              'https://lh3.googleusercontent.com/p/AF1QipOjfDo2Lw0bh-cY440_LgkeDtFbt2CSzVNtFaP_=s3072-w3072-h1414-rw',
-              'https://lh3.googleusercontent.com/p/AF1QipOnAwhOZLp-W4yey882LC5m0divZzdCxurkHewg=s3072-w3072-h1414-rw',
-              'https://lh3.googleusercontent.com/p/AF1QipO4DIrj8noPqAPywVCYHaAryS1Lv4-AtNLK5IsX=s3072-w3072-h1414-rw'
-            ].map((url, idx) => (
-              <div className="col-md-4" key={idx}>
-                <div className="gallery-wrap img d-flex align-items-end justify-content-center" style={{ backgroundImage: `url(${url})` }}>
-                  <a href="https://g.co/kgs/gVL2dX" className="icon d-flex align-items-center justify-content-center glightbox"><i className="fa fa-search" aria-hidden="true"></i></a>
-                  <div className="desc w-100 px-4">
-                    <span>Nord</span>
-                    <h2><a href="https://g.co/kgs/gVL2dX">Boysak Construction Bois</a></h2>
+            {galleryProjects.length === 0 ? (
+              <div className="col-12 text-center py-5">
+                <p style={{ color: '#999' }}>Aucun projet pour le moment.</p>
+              </div>
+            ) : (
+              galleryProjects.map((project) => (
+                <div className="col-md-4" key={project.id}>
+                  <div className="gallery-wrap img d-flex align-items-end justify-content-center" style={{ backgroundImage: `url(${project.imageUrl})` }}>
+                    <div className="desc w-100 px-4">
+                      <span>{project.location}</span>
+                      <h2>{project.description}</h2>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       </section>
