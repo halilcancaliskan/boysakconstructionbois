@@ -1,0 +1,22 @@
+# Node / Vite build artifacts
+react-app/node_modules/
+react-app/dist/
+react-app/.vite/
+react-app/.svelte-kit/
+
+# Environment variables
+react-app/.env
+react-app/.env.*
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS / Editor cruft
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
