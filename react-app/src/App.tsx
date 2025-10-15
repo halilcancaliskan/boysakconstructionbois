@@ -3,9 +3,9 @@ import emailjs from '@emailjs/browser'
 import { db } from './firebase'
 import { push, ref, serverTimestamp } from 'firebase/database'
 
-const EMAILJS_SERVICE_ID = 'service_7thf6rj'
-const EMAILJS_TEMPLATE_ID = 'template_savgei6'
-const EMAILJS_PUBLIC_KEY = 'GGcucHhcABacJLBZm'
+const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID
+const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID
+const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY
 
 const INITIAL_FORM_VALUES = {
   name: '',

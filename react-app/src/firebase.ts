@@ -3,14 +3,14 @@ import { getAnalytics, isSupported } from 'firebase/analytics'
 import { getDatabase } from 'firebase/database'
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyCBV9hlV7BgodCKQFc1rmJ_uZp8fGRd_Zk',
-  authDomain: 'boysakconstructionbois-4ddb8.firebaseapp.com',
-  databaseURL: 'https://boysakconstructionbois-4ddb8-default-rtdb.europe-west1.firebasedatabase.app',
-  projectId: 'boysakconstructionbois-4ddb8',
-  storageBucket: 'boysakconstructionbois-4ddb8.firebasestorage.app',
-  messagingSenderId: '313161485766',
-  appId: '1:313161485766:web:9d8f08cf777ec38f03f6c7',
-  measurementId: 'G-94HQEEKQJ2'
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 }
 
 const firebaseApp = initializeApp(firebaseConfig)
