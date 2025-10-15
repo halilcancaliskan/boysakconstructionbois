@@ -1,12 +1,13 @@
 # Node / Vite build artifacts
-react-app/node_modules/
-react-app/dist/
-react-app/.vite/
-react-app/.svelte-kit/
+node_modules/
+dist/
+.vite/
+.svelte-kit/
 
 # Environment variables
-react-app/.env
-react-app/.env.*
+.env
+.env.*
+!.env.example
 
 # Logs
 npm-debug.log*
