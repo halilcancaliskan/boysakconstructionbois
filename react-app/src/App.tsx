@@ -1,4 +1,20 @@
 import React from 'react'
+import emailjs from '@emailjs/browser'
+import { db } from './firebase'
+import { push, ref, serverTimestamp } from 'firebase/database'
+
+const EMAILJS_SERVICE_ID = 'service_7thf6rj'
+const EMAILJS_TEMPLATE_ID = 'template_savgei6'
+const EMAILJS_PUBLIC_KEY = 'GGcucHhcABacJLBZm'
+
+const INITIAL_FORM_VALUES = {
+  name: '',
+  email: '',
+  telephone: '',
+  subject: '',
+  message: '',
+  newsletter: false
+}
 
 function AccordionItem({ id, question, answer }: { id: string, question: string, answer: string }) {
   const [open, setOpen] = React.useState(false)
@@ -15,6 +31,68 @@ function AccordionItem({ id, question, answer }: { id: string, question: string,
 }
 
 export default function App() {
+  const [formData, setFormData] = React.useState({ ...INITIAL_FORM_VALUES })
+  const [status, setStatus] = React.useState<{ type: 'idle' | 'success' | 'error'; message: string }>({ type: 'idle', message: '' })
+  const [isSubmitting, setIsSubmitting] = React.useState(false)
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const target = event.target
+    const { name, value } = target
+    const nextValue = target instanceof HTMLInputElement && target.type === 'checkbox' ? target.checked : value
+    setFormData((prev) => ({
+      ...prev,
+      [name]: nextValue
+    }))
+  }
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (!formData.name || !formData.email || !formData.message) {
+      setStatus({ type: 'error', message: 'Merci de compléter les champs obligatoires avant l\'envoi.' })
+      return
+    }
+
+    setIsSubmitting(true)
+    setStatus({ type: 'idle', message: '' })
+
+    const subject = formData.subject.trim() || 'Demande de contact'
+    const templateParams = {
+      name: formData.name,
+      from_name: formData.name,
+      user_name: formData.name,
+      email: formData.email,
+      from_email: formData.email,
+      user_email: formData.email,
+      reply_to: formData.email,
+      phone: formData.telephone,
+      subject,
+      message: formData.message,
+      newsletter: formData.newsletter ? 'Oui' : 'Non'
+    }
+
+    try {
+      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams, EMAILJS_PUBLIC_KEY)
+      await push(ref(db, 'contactMessages'), {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.telephone,
+        subject,
+        message: formData.message,
+        newsletter: formData.newsletter,
+        source: 'react-app',
+        createdAt: serverTimestamp()
+      })
+
+  setStatus({ type: 'success', message: 'Merci ! Votre message a bien été envoyé.' })
+  setFormData({ ...INITIAL_FORM_VALUES })
+    } catch (error) {
+      console.error('Échec de l\'envoi du formulaire de contact', error)
+      setStatus({ type: 'error', message: 'Une erreur est survenue pendant l\'envoi. Merci de réessayer dans quelques instants.' })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   return (
     <>
       <header>
@@ -82,30 +160,101 @@ export default function App() {
         <div className="container-xl">
           <div className="row">
             <div className="col-lg-6 col-md-6 d-flex align-item-center">
-              <form className="appointment aside-stretch2" id="contactForm" onSubmit={(e) => e.preventDefault()}>
+              <form className="appointment aside-stretch2" id="contactForm" onSubmit={handleSubmit}>
                 <span className="subheading">Un devis toiture ou charpente ? B.C.B vous renseigne.</span>
                 <h2 className="mb-4 appointment-head">Je dépose mon projet</h2>
                 <div className="row">
-                  <div className="alert" style={{ display: 'none' }}></div>
+                  {status.type !== 'idle' && (
+                    <div className="col-12 mb-3">
+                      <div className={`alert ${status.type === 'success' ? 'alert-success' : 'alert-danger'}`} role="alert">
+                        {status.message}
+                      </div>
+                    </div>
+                  )}
                   <div className="col-lg-6 col-md-12 mb-3">
                     <label htmlFor="name">Nom complet</label>
-                    <input required className="form-control" type="text" id="name" placeholder="Nom, prénom" />
+                    <input
+                      required
+                      className="form-control"
+                      type="text"
+                      id="name"
+                      name="name"
+                      placeholder="Nom, prénom"
+                      value={formData.name}
+                      onChange={handleChange}
+                    />
                   </div>
                   <div className="col-lg-6 col-md-12 mb-3">
-                    <label htmlFor="emailid">Adresse mail</label>
-                    <input required className="form-control" type="email" id="emailid" placeholder="E-mail" />
+                    <label htmlFor="email">Adresse mail</label>
+                    <input
+                      required
+                      className="form-control"
+                      type="email"
+                      id="email"
+                      name="email"
+                      placeholder="E-mail"
+                      value={formData.email}
+                      onChange={handleChange}
+                    />
                   </div>
                   <div className="col-lg-6 col-md-12 mb-3">
                     <label htmlFor="telephone">Téléphone</label>
-                    <input required className="form-control" type="tel" id="telephone" placeholder="Téléphone" />
+                    <input
+                      required
+                      className="form-control"
+                      type="tel"
+                      id="telephone"
+                      name="telephone"
+                      placeholder="Téléphone"
+                      value={formData.telephone}
+                      onChange={handleChange}
+                    />
                   </div>
-                  <div className="col-md-12">
+                  <div className="col-lg-6 col-md-12 mb-3">
+                    <label htmlFor="subject">Sujet</label>
+                    <input
+                      className="form-control"
+                      type="text"
+                      id="subject"
+                      name="subject"
+                      placeholder="Sujet de votre demande"
+                      value={formData.subject}
+                      onChange={handleChange}
+                    />
+                  </div>
+                  <div className="col-md-12 mb-3">
                     <label htmlFor="message">Message</label>
-                    <textarea className="p-2 w-100" id="message" cols={30} rows={10} placeholder="Message"></textarea>
+                    <textarea
+                      required
+                      className="p-2 w-100 form-control"
+                      id="message"
+                      name="message"
+                      cols={30}
+                      rows={10}
+                      placeholder="Message"
+                      value={formData.message}
+                      onChange={handleChange}
+                    ></textarea>
                   </div>
-                  <div id="form" style={{ marginLeft: 'auto', marginRight: 'auto' }} className="g-recaptcha" data-sitekey="6LfRTiwiAAAAAPEgtId8rktsjUcgvvGxMvAXBrP1"></div>
+                  <div className="col-md-12 mb-3">
+                    <div className="form-check">
+                      <input
+                        className="form-check-input"
+                        type="checkbox"
+                        id="newsletter"
+                        name="newsletter"
+                        checked={formData.newsletter}
+                        onChange={handleChange}
+                      />
+                      <label className="form-check-label" htmlFor="newsletter">
+                        Je souhaite recevoir la newsletter
+                      </label>
+                    </div>
+                  </div>
                   <div className="col-md-12">
-                    <input type="submit" value="Envoyer le message" className="btn btn-sec py-3 px-4" />
+                    <button type="submit" className="btn btn-sec py-3 px-4" disabled={isSubmitting}>
+                      {isSubmitting ? 'Envoi en cours…' : 'Envoyer le message'}
+                    </button>
                   </div>
                 </div>
               </form>
