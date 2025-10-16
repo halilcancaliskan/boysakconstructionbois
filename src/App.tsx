@@ -151,8 +151,6 @@ export default function App() {
                   <p className="contacts-head">Adresse mail: <a href="mailto:furkan.boysak@gmail.com">furkan.boysak@gmail.com</a></p>
                 </div>
                 <ul className="d-flex pe-3">
-                  <li><a href="https://g.co/kgs/yHNaev" target="_blank" rel="noreferrer"><i className="fa fa-twitter" aria-hidden="true"></i></a></li>
-                  <li><a href="https://g.co/kgs/yHNaev" target="_blank" rel="noreferrer"><i className="fa fa-facebook" aria-hidden="true"></i></a></li>
                   <li><a href="https://www.instagram.com/boysak_construction_bois/" target="_blank" rel="noreferrer"><i className="fa fa-instagram" aria-hidden="true"></i></a></li>
                 </ul>
               </div>
@@ -597,8 +595,6 @@ export default function App() {
                 <h2 className="ftco-heading-2 logo d-flex"><a href="#0" className="navbar-brand align-items-center">BCB</a></h2>
                 <p>Construisons votre maison, construisons votre rêve.</p>
                 <ul className="ftco-footer-social list-unstyled mt-2">
-                  <li><a href="https://g.co/kgs/yHNaev" target="_blank" rel="noreferrer"><i className="fa fa-twitter" aria-hidden="true"></i></a></li>
-                  <li><a href="https://g.co/kgs/yHNaev" target="_blank" rel="noreferrer"><i className="fa fa-facebook" aria-hidden="true"></i></a></li>
                   <li><a href="https://www.instagram.com/boysak_construction_bois/" target="_blank" rel="noreferrer"><i className="fa fa-instagram" aria-hidden="true"></i></a></li>
                 </ul>
               </div>
