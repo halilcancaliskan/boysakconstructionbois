@@ -2,6 +2,7 @@ import React from 'react'
 import emailjs from '@emailjs/browser'
 import { db } from './firebase'
 import { push, ref, serverTimestamp, onValue } from 'firebase/database'
+import './gallery.css'
 
 const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID
 const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID
@@ -43,6 +44,7 @@ export default function App() {
   const [status, setStatus] = React.useState<{ type: 'idle' | 'success' | 'error'; message: string }>({ type: 'idle', message: '' })
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const [galleryProjects, setGalleryProjects] = React.useState<GalleryProject[]>([])
+  const [lightboxImage, setLightboxImage] = React.useState<GalleryProject | null>(null)
 
   // Load gallery projects from Firebase
   React.useEffect(() => {
@@ -61,6 +63,17 @@ export default function App() {
     })
     return () => unsubscribe()
   }, [])
+
+  // Close lightbox with Escape key
+  React.useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && lightboxImage) {
+        setLightboxImage(null)
+      }
+    }
+    window.addEventListener('keydown', handleEscape)
+    return () => window.removeEventListener('keydown', handleEscape)
+  }, [lightboxImage])
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const target = event.target
@@ -454,25 +467,50 @@ export default function App() {
       </section>
 
       <section className="ftco-gallery ftco-section">
-        <div id="projets" className="container-xl-fluid">
+        <div id="projets" className="container-xl">
           <div className="row justify-content-center">
             <div className="col-md-7 mb-3 text-center heading-sec">
               <span className="sunheading">Portfolio</span>
               <h2>Galerie Projets</h2>
             </div>
           </div>
-          <div className="row g-0">
+          <div className="row g-3">
             {galleryProjects.length === 0 ? (
               <div className="col-12 text-center py-5">
                 <p style={{ color: '#999' }}>Aucun projet pour le moment.</p>
               </div>
             ) : (
               galleryProjects.map((project) => (
-                <div className="col-md-4" key={project.id}>
-                  <div className="gallery-wrap img d-flex align-items-end justify-content-center" style={{ backgroundImage: `url(${project.imageUrl})` }}>
-                    <div className="desc w-100 px-4">
-                      <span>{project.location}</span>
-                      <h2>{project.description}</h2>
+                <div className="col-md-4 mb-4" key={project.id}>
+                  <div className="gallery-item">
+                    <div 
+                      className="gallery-wrap img" 
+                      style={{ 
+                        backgroundImage: `url(${project.imageUrl})`, 
+                        cursor: 'pointer',
+                        height: '340px',
+                        borderRadius: '8px 8px 0 0'
+                      }}
+                      onClick={() => setLightboxImage(project)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => e.key === 'Enter' && setLightboxImage(project)}
+                    >
+                      {/* Overlay on hover */}
+                      <div className="gallery-overlay">
+                        <i className="fa fa-search-plus" style={{ fontSize: '30px', color: 'white' }}></i>
+                      </div>
+                    </div>
+                    <div className="gallery-info">
+                      <div className="d-flex align-items-center justify-content-between">
+                        <div>
+                          <h3 className="gallery-title">{project.description}</h3>
+                          <p className="gallery-location">
+                            <i className="fa fa-map-marker" style={{ marginRight: '8px' }}></i>
+                            {project.location}
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -630,6 +668,101 @@ export default function App() {
           </div>
         </div>
       </footer>
+
+      {/* Lightbox Modal */}
+      {lightboxImage && (
+        <div 
+          className="lightbox-backdrop"
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.95)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px',
+            cursor: 'pointer'
+          }}
+          onClick={() => setLightboxImage(null)}
+        >
+          <button
+            style={{
+              position: 'absolute',
+              top: '20px',
+              right: '20px',
+              background: 'transparent',
+              border: 'none',
+              color: 'white',
+              fontSize: '40px',
+              cursor: 'pointer',
+              zIndex: 10000,
+              width: '50px',
+              height: '50px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'transform 0.2s'
+            }}
+            onClick={(e) => {
+              e.stopPropagation()
+              setLightboxImage(null)
+            }}
+            onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+            onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+            aria-label="Fermer"
+          >
+            ×
+          </button>
+          <div 
+            className="lightbox-content"
+            style={{
+              maxWidth: '90vw',
+              maxHeight: '90vh',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img 
+              src={lightboxImage.imageUrl} 
+              alt={lightboxImage.description}
+              style={{
+                maxWidth: '100%',
+                maxHeight: '80vh',
+                objectFit: 'contain',
+                borderRadius: '8px',
+                boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
+              }}
+            />
+            <div style={{
+              marginTop: '20px',
+              textAlign: 'center',
+              color: 'white',
+              maxWidth: '600px'
+            }}>
+              <h3 style={{ 
+                fontSize: '24px', 
+                marginBottom: '10px',
+                fontWeight: 'bold'
+              }}>
+                {lightboxImage.description}
+              </h3>
+              <p style={{ 
+                fontSize: '18px',
+                color: '#7ED957',
+                fontWeight: '500'
+              }}>
+                {lightboxImage.location}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }
