@@ -2,6 +2,7 @@ import React from 'react'
 import emailjs from '@emailjs/browser'
 import { db } from './firebase'
 import { push, ref, serverTimestamp, onValue } from 'firebase/database'
+import { SEOSchema } from './SEOSchema'
 import './gallery.css'
 
 const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID
@@ -135,6 +136,7 @@ export default function App() {
 
   return (
     <>
+      <SEOSchema />
       <header>
         <div className="top-wrap">
           <div className="container">
@@ -183,11 +185,11 @@ export default function App() {
           <div className="row  slider-text align-items-center justify-content-center text-center">
             <div className="col-lg-9">
               <div className="mt-5">
-                <span className="subheading">Depuis 2020</span>
-                <h1 className="mb-5">Construisons votre <span>maison</span>, construisons votre <span>rêve</span></h1>
+                <span className="subheading">Construction Bois à Lille depuis 2020</span>
+                <h1 className="mb-5">Expert en <span>Charpente</span> et <span>Ossature Bois</span> dans les Hauts-de-France</h1>
                 <p className="mb-5">
                   <a href="#aproposde" className=" btn-sec p-4 py-3">A propos de nous <i className="fa fa-arrow-right" aria-hidden="true"></i></a>
-                  <a href="#devis" className="btn btn-right p-4 py-3">Demander un devis<i className="fa fa-arrow-right" aria-hidden="true"></i></a>
+                  <a href="#devis" className="btn btn-right p-4 py-3">Devis gratuit<i className="fa fa-arrow-right" aria-hidden="true"></i></a>
                 </p>
               </div>
             </div>
@@ -335,37 +337,37 @@ export default function App() {
               <div className="row">
                 <div className="col-lg-6 service-wrap">
                   <div className="services x-services123 d-flex  mt-2">
-                    <div className="icon"><img src="/images/building.png" alt="" /></div>
+                    <div className="icon"><img src="/images/building.png" alt="Charpente bois traditionnelle" /></div>
                     <div className="text">
-                      <h2>Charpente</h2>
-                      <p>Bois façonné, structures durables, charpenterie d'excellence.</p>
+                      <h2>Charpente Traditionnelle</h2>
+                      <p>Fabrication artisanale de charpentes en bois massif. Structures durables et résistantes pour maisons, extensions et toitures.</p>
                     </div>
                   </div>
                 </div>
                 <div className="col-lg-6 service-wrap">
                   <div className="services x-services123 d-flex  mt-2">
-                    <div className="icon"><img src="/images/blueprint.png" alt="" /></div>
+                    <div className="icon"><img src="/images/blueprint.png" alt="Ossature bois" /></div>
                     <div className="text">
-                      <h2>Architecture</h2>
-                      <p>Design innovant, espaces uniques, esthétique fonctionnelle.</p>
+                      <h2>Ossature Bois</h2>
+                      <p>Construction de maisons à ossature bois performantes. Extensions, surélévations et bâtiments neufs écologiques.</p>
                     </div>
                   </div>
                 </div>
                 <div className="col-lg-6 service-wrap">
                   <div className="services x-services123 d-flex mt-2">
-                    <div className="icon"><img src="/images/consult.png" alt="" /></div>
+                    <div className="icon"><img src="/images/consult.png" alt="Terrasse et bardage bois" /></div>
                     <div className="text">
-                      <h2>Conseil</h2>
-                      <p>Expertise personnalisée, guidance éclairée, projets réussis.</p>
+                      <h2>Terrasse & Bardage Bois</h2>
+                      <p>Installation de terrasses en bois exotique et composite. Pose de bardage bois pour isolation thermique et esthétique.</p>
                     </div>
                   </div>
                 </div>
                 <div className="col-lg-6 service-wrap">
                   <div className="services x-services123 d-flex  mt-2">
-                    <div className="icon"><img src="/images/helmet.png" alt="" /></div>
+                    <div className="icon"><img src="/images/helmet.png" alt="Rénovation bois" /></div>
                     <div className="text">
-                      <h2>Travaux Mécaniques</h2>
-                      <p>Excellence intégrée, norme permanente, satisfaction garantie.</p>
+                      <h2>Rénovation & Aménagement</h2>
+                      <p>Rénovation de charpentes anciennes, aménagement de combles, création de pergolas et abris de jardin en bois.</p>
                     </div>
                   </div>
                 </div>
@@ -402,8 +404,8 @@ export default function App() {
         <div className="container-xl">
           <div className="row justify-content-center">
             <div className="col-md-8 mb-3 text-center heading-sec">
-              <span className="subheading">Charpente, Ossature bois, rénovation</span>
-              <h2>Nos Services</h2>
+              <span className="subheading">Construction Bois | Charpente | Ossature Bois | Terrasse</span>
+              <h2>Nos Services de Construction Bois à Lille</h2>
             </div>
           </div>
           <div className="row">

@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" width="180" height="180">
+  <!-- Background circle -->
+  <circle cx="90" cy="90" r="90" fill="#7ED957"/>
+  
+  <!-- Hammer head (larger and more detailed) -->
+  <rect x="107" y="50" width="45" height="34" rx="4" fill="#333333"/>
+  <rect x="118" y="45" width="23" height="10" rx="3" fill="#555555"/>
+  
+  <!-- Claw part of hammer -->
+  <path d="M 107 70 Q 102 75 107 84 L 112 84 L 112 70 Z" fill="#333333"/>
+  
+  <!-- Hammer handle -->
+  <rect x="40" y="67" width="80" height="17" rx="8" fill="#8B4513" transform="rotate(-45 80 75.5)"/>
+  
+  <!-- Handle grip lines -->
+  <line x1="56" y1="78" x2="62" y2="84" stroke="#654321" stroke-width="4" stroke-linecap="round"/>
+  <line x1="68" y1="90" x2="74" y2="96" stroke="#654321" stroke-width="4" stroke-linecap="round"/>
+  <line x1="80" y1="102" x2="86" y2="108" stroke="#654321" stroke-width="4" stroke-linecap="round"/>
+  <line x1="92" y1="114" x2="98" y2="120" stroke="#654321" stroke-width="4" stroke-linecap="round"/>
+  
+  <!-- Metal shine effect on hammer head -->
+  <rect x="113" y="56" width="8" height="18" rx="2" fill="#666666" opacity="0.5"/>
+  <rect x="125" y="56" width="4" height="18" rx="1" fill="#888888" opacity="0.3"/>
+  
+  <!-- Handle end cap -->
+  <circle cx="43" cy="113" r="5" fill="#654321"/>
+</svg>

@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://boysakconstructionbois.fr/sitemap.xml
+
+# Disallow admin pages
+User-agent: *
+Disallow: /#/admin
+
+# Crawl-delay
+User-agent: *
+Crawl-delay: 1

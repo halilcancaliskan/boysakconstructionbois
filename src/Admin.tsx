@@ -11,6 +11,17 @@ interface GalleryProject {
   createdAt: number
 }
 
+interface ContactMessage {
+  id: string
+  name: string
+  email: string
+  telephone: string
+  subject: string
+  message: string
+  newsletter: boolean
+  createdAt: number
+}
+
 export default function Admin() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -18,6 +29,7 @@ export default function Admin() {
   const [loading, setLoading] = useState(true)
   const [loginError, setLoginError] = useState('')
   const [projects, setProjects] = useState<GalleryProject[]>([])
+  const [newsletterSubscribers, setNewsletterSubscribers] = useState<ContactMessage[]>([])
   const [uploading, setUploading] = useState(false)
   const [formData, setFormData] = useState({
     description: '',
@@ -48,6 +60,28 @@ export default function Admin() {
           setProjects(projectsList.sort((a, b) => b.createdAt - a.createdAt))
         } else {
           setProjects([])
+        }
+      })
+      return () => unsubscribe()
+    }
+  }, [user])
+
+  // Load newsletter subscribers
+  useEffect(() => {
+    if (user) {
+      const contactRef = ref(db, 'contact-messages')
+      const unsubscribe = onValue(contactRef, (snapshot) => {
+        const data = snapshot.val()
+        if (data) {
+          const messagesList: ContactMessage[] = Object.entries(data).map(([id, message]: [string, any]) => ({
+            id,
+            ...message
+          }))
+          // Filter only newsletter subscribers
+          const subscribers = messagesList.filter(msg => msg.newsletter === true)
+          setNewsletterSubscribers(subscribers.sort((a, b) => b.createdAt - a.createdAt))
+        } else {
+          setNewsletterSubscribers([])
         }
       })
       return () => unsubscribe()
@@ -327,7 +361,7 @@ export default function Admin() {
         </div>
 
         {/* List of existing projects */}
-        <div style={{ background: 'white', padding: '30px', borderRadius: '10px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
+        <div style={{ background: 'white', padding: '30px', borderRadius: '10px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)', marginBottom: '30px' }}>
           <h3 style={{ marginBottom: '20px' }}>Projets existants ({projects.length})</h3>
           <div className="row">
             {projects.length === 0 ? (
@@ -367,6 +401,108 @@ export default function Admin() {
               ))
             )}
           </div>
+        </div>
+
+        {/* Newsletter Subscribers Section */}
+        <div style={{ background: 'white', padding: '30px', borderRadius: '10px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <h3 style={{ margin: 0 }}>Abonnés Newsletter ({newsletterSubscribers.length})</h3>
+            {newsletterSubscribers.length > 0 && (
+              <button 
+                className="btn btn-success"
+                onClick={() => {
+                  const emails = newsletterSubscribers.map(sub => sub.email).join(', ')
+                  navigator.clipboard.writeText(emails)
+                  alert('Emails copiés dans le presse-papier !')
+                }}
+              >
+                📋 Copier tous les emails
+              </button>
+            )}
+          </div>
+          
+          {newsletterSubscribers.length === 0 ? (
+            <p style={{ textAlign: 'center', color: '#999', padding: '40px' }}>
+              Aucun abonné pour le moment.
+            </p>
+          ) : (
+            <div style={{ overflowX: 'auto' }}>
+              <table className="table table-striped table-hover">
+                <thead style={{ background: '#7ED957', color: 'white' }}>
+                  <tr>
+                    <th>Nom</th>
+                    <th>Email</th>
+                    <th>Téléphone</th>
+                    <th>Date d'inscription</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {newsletterSubscribers.map((subscriber) => (
+                    <tr key={subscriber.id}>
+                      <td style={{ fontWeight: 'bold' }}>{subscriber.name}</td>
+                      <td>
+                        <a href={`mailto:${subscriber.email}`} style={{ color: '#7ED957', textDecoration: 'none' }}>
+                          {subscriber.email}
+                        </a>
+                      </td>
+                      <td>{subscriber.telephone || '-'}</td>
+                      <td>
+                        {subscriber.createdAt 
+                          ? new Date(subscriber.createdAt).toLocaleDateString('fr-FR', {
+                              day: '2-digit',
+                              month: '2-digit',
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })
+                          : '-'
+                        }
+                      </td>
+                      <td>
+                        <button 
+                          className="btn btn-sm btn-outline-primary"
+                          onClick={() => {
+                            navigator.clipboard.writeText(subscriber.email)
+                            alert(`Email "${subscriber.email}" copié !`)
+                          }}
+                          title="Copier l'email"
+                        >
+                          📋 Copier
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              
+              {/* Export to CSV */}
+              <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                <button 
+                  className="btn btn-primary"
+                  onClick={() => {
+                    const csvContent = [
+                      ['Nom', 'Email', 'Téléphone', 'Date d\'inscription'],
+                      ...newsletterSubscribers.map(sub => [
+                        sub.name,
+                        sub.email,
+                        sub.telephone || '',
+                        sub.createdAt ? new Date(sub.createdAt).toLocaleString('fr-FR') : ''
+                      ])
+                    ].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n')
+                    
+                    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' })
+                    const link = document.createElement('a')
+                    link.href = URL.createObjectURL(blob)
+                    link.download = `newsletter_subscribers_${new Date().toISOString().split('T')[0]}.csv`
+                    link.click()
+                  }}
+                >
+                  📥 Exporter en CSV
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
