@@ -1,4 +1,10 @@
 {
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ],
   "redirects": [
     {
       "source": "/:path*",
@@ -10,6 +16,11 @@
       ],
       "destination": "https://boysakconstructionbois.fr/:path*",
       "permanent": true
+    },
+    {
+      "source": "/admin",
+      "destination": "/#/admin",
+      "permanent": false
     }
   ],
   "headers": [
