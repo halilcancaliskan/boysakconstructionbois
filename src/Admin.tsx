@@ -15,7 +15,8 @@ interface ContactMessage {
   id: string
   name: string
   email: string
-  telephone: string
+  phone?: string
+  telephone?: string
   subject: string
   message: string
   newsletter: boolean
@@ -69,18 +70,44 @@ export default function Admin() {
   // Load newsletter subscribers
   useEffect(() => {
     if (user) {
-      const contactRef = ref(db, 'contact-messages')
+      const contactRef = ref(db, 'contactMessages')
       const unsubscribe = onValue(contactRef, (snapshot) => {
         const data = snapshot.val()
+        console.log('📧 Raw Firebase data:', data)
+        
         if (data) {
           const messagesList: ContactMessage[] = Object.entries(data).map(([id, message]: [string, any]) => ({
             id,
             ...message
           }))
+          
+          console.log('📊 All messages:', messagesList.length)
+          console.log('📋 Messages with newsletter field:', messagesList.map(msg => ({
+            email: msg.email,
+            newsletter: msg.newsletter,
+            type: typeof msg.newsletter
+          })))
+          
           // Filter only newsletter subscribers
           const subscribers = messagesList.filter(msg => msg.newsletter === true)
-          setNewsletterSubscribers(subscribers.sort((a, b) => b.createdAt - a.createdAt))
+          console.log('✅ Newsletter subscribers:', subscribers.length, subscribers)
+          
+          // Remove duplicates: keep only the most recent subscription per email
+          const uniqueSubscribers = subscribers.reduce((acc: ContactMessage[], current) => {
+            const existing = acc.find(sub => sub.email === current.email)
+            if (!existing) {
+              acc.push(current)
+            } else if (current.createdAt > existing.createdAt) {
+              // Replace with more recent subscription
+              const index = acc.indexOf(existing)
+              acc[index] = current
+            }
+            return acc
+          }, [])
+          
+          setNewsletterSubscribers(uniqueSubscribers.sort((a, b) => b.createdAt - a.createdAt))
         } else {
+          console.log('❌ No data in contact-messages')
           setNewsletterSubscribers([])
         }
       })
@@ -446,7 +473,7 @@ export default function Admin() {
                           {subscriber.email}
                         </a>
                       </td>
-                      <td>{subscriber.telephone || '-'}</td>
+                      <td>{subscriber.phone || subscriber.telephone || '-'}</td>
                       <td>
                         {subscriber.createdAt 
                           ? new Date(subscriber.createdAt).toLocaleDateString('fr-FR', {
@@ -486,7 +513,7 @@ export default function Admin() {
                       ...newsletterSubscribers.map(sub => [
                         sub.name,
                         sub.email,
-                        sub.telephone || '',
+                        sub.phone || sub.telephone || '',
                         sub.createdAt ? new Date(sub.createdAt).toLocaleString('fr-FR') : ''
                       ])
                     ].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n')
