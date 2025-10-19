@@ -143,16 +143,13 @@ export default function App() {
             <div className="row justify-content-between">
               <div className="col-md-6 d-flex align-items-center number-set ps-0">
                 <div className="text-sec">
-                  <p className="contacts-head">Appel gratuit: <a href="tel:123445678910">+33 7 68 90 68 90</a></p>
+                  <p className="contacts-head">Contact: <a href="tel:123445678910">+33 7 68 90 68 90</a></p>
                 </div>
               </div>
               <div className="col-md-6 d-flex justify-content-lg-end align-items-center pe-0 topper">
                 <div className="d-flex  text-sec">
                   <p className="contacts-head">Adresse mail: <a href="mailto:furkan.boysak@gmail.com">furkan.boysak@gmail.com</a></p>
                 </div>
-                <ul className="d-flex pe-3">
-                  <li><a href="https://www.instagram.com/boysak_construction_bois/" target="_blank" rel="noreferrer"><i className="fa fa-instagram" aria-hidden="true"></i></a></li>
-                </ul>
               </div>
             </div>
           </div>
